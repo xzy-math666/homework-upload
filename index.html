@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>作业提交</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --ok: #16a34a;
+      --err: #dc2626;
+      --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg); color: var(--text); min-height: 100vh;
+      padding: 16px 12px calc(24px + env(safe-area-inset-bottom));
+    }
+    .card {
+      max-width: 520px; margin: 0 auto; background: var(--card);
+      border-radius: 16px; padding: 20px; box-shadow: 0 1px 3px rgba(15,23,42,.08);
+    }
+    h1 { font-size: 20px; text-align: center; margin-bottom: 4px; }
+    .sub { text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+    label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 4px; }
+    input[type=text] {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+      border-radius: 10px; font-size: 15px; background: #fff;
+    }
+    input[type=text]:focus { outline: 2px solid var(--primary); border-color: transparent; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .drop {
+      margin-top: 16px; border: 2px dashed #cbd5e1; border-radius: 12px;
+      padding: 28px 12px; text-align: center; color: var(--muted);
+      font-size: 14px; cursor: pointer; transition: border-color .15s, background .15s;
+    }
+    .drop.active { border-color: var(--primary); background: #eff6ff; color: var(--primary); }
+    #file-input { display: none; }
+    #files { list-style: none; margin-top: 12px; }
+    #files li {
+      display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+      border: 1px solid var(--border); border-radius: 10px; margin-bottom: 6px;
+      font-size: 13px;
+    }
+    #files .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #files .size { color: var(--muted); font-size: 12px; flex-shrink: 0; }
+    #files .status { flex-shrink: 0; font-size: 12px; }
+    .bar-wrap { width: 60px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; flex-shrink: 0; }
+    .bar { height: 100%; background: var(--primary); width: 0; transition: width .2s; }
+    .status.ok { color: var(--ok); }
+    .status.err { color: var(--err); }
+    button {
+      width: 100%; margin-top: 16px; padding: 13px; border: none; border-radius: 12px;
+      background: var(--primary); color: #fff; font-size: 16px; font-weight: 600;
+      cursor: pointer;
+    }
+    button:disabled { background: #93c5fd; cursor: not-allowed; }
+    button.secondary {
+      background: transparent; color: var(--primary); border: 1px solid var(--primary);
+      font-weight: 500; font-size: 14px; padding: 10px; margin-top: 10px;
+    }
+    #msg { text-align: center; font-size: 14px; margin-top: 12px; min-height: 20px; }
+    #msg.ok { color: var(--ok); }
+    #msg.err { color: var(--err); }
+    .tip { text-align: center; color: var(--muted); font-size: 12px; margin-top: 16px; }
+    .tip a { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>📚 作业提交</h1>
+    <div class="sub">上传后将自动保存到老师的作业库</div>
+
+    <form id="form">
+      <label>班级 *</label>
+      <input type="text" id="cls" placeholder="例如: 高一3班" required>
+
+      <div class="row">
+        <div>
+          <label>姓名 *</label>
+          <input type="text" id="name" placeholder="姓名" required>
+        </div>
+        <div>
+          <label>学号</label>
+          <input type="text" id="sid" placeholder="选填, 如 20250101">
+        </div>
+      </div>
+
+      <label>作业名称</label>
+      <input type="text" id="assign" placeholder="选填, 如 第1次数学作业">
+
+      <div id="passcode-box" style="display:none">
+        <label>提交密码 *</label>
+        <input type="text" id="passcode" placeholder="老师提供的提交密码">
+      </div>
+
+      <div class="drop" id="drop">点击选择文件, 或拖拽到这里<br><span style="font-size:12px">可多选, 支持图片 / PDF / Word 等</span></div>
+      <input type="file" id="file-input" multiple>
+      <ul id="files"></ul>
+
+      <button type="submit" id="btn-upload" disabled>开始上传</button>
+      <button type="button" class="secondary" id="btn-reset" style="display:none">继续提交下一个同学</button>
+    </form>
+
+    <div id="msg"></div>
+    <div class="tip"><a href="teacher.html">教师入口</a> · 上传即代表同意提交</div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

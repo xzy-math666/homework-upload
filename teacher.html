@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>作业库 · 教师查看</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, "PingFang SC", sans-serif; background: #f1f5f9; color: #0f172a; padding: 20px 12px; }
+    .card { max-width: 760px; margin: 0 auto; background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 1px 3px rgba(15,23,42,.08); }
+    h1 { font-size: 19px; margin-bottom: 12px; }
+    #pass { width: 220px; padding: 8px 10px; border: 1px solid #e2e8f0; border-radius: 8px; }
+    button { padding: 8px 16px; border: none; border-radius: 8px; background: #2563eb; color: #fff; cursor: pointer; margin-left: 6px; }
+    .group { margin: 14px 0 4px; font-size: 14px; font-weight: 600; color: #1d4ed8; }
+    .file { display: flex; gap: 10px; padding: 6px 0 6px 16px; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
+    .file .k { flex: 1; word-break: break-all; }
+    .file .m { color: #64748b; flex-shrink: 0; }
+    #sum { color: #64748b; font-size: 13px; margin: 10px 0; }
+    #msg { color: #dc2626; font-size: 13px; margin-top: 10px; }
+    .note { margin-top: 16px; font-size: 12px; color: #94a3b8; line-height: 1.7; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>📥 作业库</h1>
+    <div>
+      <input type="password" id="pass" placeholder="提交密码 (老师用)">
+      <button onclick="load()">查看</button>
+      <a href="./" style="margin-left:10px;color:#64748b;font-size:13px">← 返回提交页</a>
+    </div>
+    <div id="sum"></div>
+    <div id="list"></div>
+    <div id="msg"></div>
+    <div class="note">此页面仅供快速查看。批量下载 / 归档 / 统计请用 rclone 或交给 AI agent 处理(见 README)。</div>
+  </div>
+
+  <script>
+    // API 服务器 (阿里云函数计算), 与 app.js 一致
+    const API_HOST = "https://homework-upload-exygqrzxsj.cn-shenzhen.fcapp.run";
+    const API = location.hostname.endsWith(".fcapp.run") || location.hostname.endsWith(".fc.aliyuncs.com") ? "" : API_HOST;
+
+    async function load() {
+      const pc = document.getElementById("pass").value.trim();
+      const msgEl = document.getElementById("msg");
+      msgEl.textContent = "";
+      const res = await fetch(API + "/api/files?passcode=" + encodeURIComponent(pc));
+      if (res.status === 401) { msgEl.textContent = "密码错误"; return; }
+      const data = await res.json();
+      const files = data.files || [];
+      document.getElementById("sum").textContent = `共 ${files.length} 个文件`;
+      // 按 <班级>/<学号_姓名> 分组展示
+      const groups = {};
+      for (const f of files) {
+        const parts = f.key.split("/");
+        const g = parts.slice(0, 2).join(" / ");
+        (groups[g] = groups[g] || []).push(f);
+      }
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+      for (const [g, arr] of Object.entries(groups)) {
+        const h = document.createElement("div"); h.className = "group"; h.textContent = g + ` (${arr.length})`;
+        list.appendChild(h);
+        for (const f of arr) {
+          const row = document.createElement("div"); row.className = "file";
+          const k = document.createElement("span"); k.className = "k"; k.textContent = f.key.split("/").slice(2).join("/");
+          const m = document.createElement("span"); m.className = "m"; m.textContent = (f.size / 1024).toFixed(1) + " KB";
+          row.append(k, m);
+          list.appendChild(row);
+        }
+      }
+      if (!files.length) { list.innerHTML = "<div style='color:#94a3b8'>还没有收到作业</div>"; }
+    }
+  </script>
+</body>
+</html>
