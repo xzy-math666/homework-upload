@@ -8,7 +8,7 @@
   const API = location.hostname.endsWith(".fcapp.run") || location.hostname.endsWith(".fc.aliyuncs.com") ? "" : API_HOST;
 
   const $ = (id) => document.getElementById(id);
-  const form = $("form"), cls = $("cls"), name = $("name"), sid = $("sid"),
+  const form = $("form"), subject = $("subject"), name = $("name"), sid = $("sid"),
         assign = $("assign"), passcodeBox = $("passcode-box"), passcode = $("passcode"),
         drop = $("drop"), fileInput = $("file-input"), filesList = $("files"),
         btnUpload = $("btn-upload"), btnReset = $("btn-reset"), msg = $("msg");
@@ -85,7 +85,7 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          class: cls.value.trim(),
+          subject: subject.value.trim(),
           studentName: name.value.trim(),
           studentId: sid.value.trim() || "",
           assignment: assign.value.trim() || "",
@@ -137,7 +137,7 @@
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    if (!cls.value.trim() || !name.value.trim()) { setMsg("请填写班级和姓名", "err"); return; }
+    if (!subject.value.trim() || !name.value.trim()) { setMsg("请填写科目和姓名", "err"); return; }
     if (cfg.passcodeRequired) {
       if (!passcode.value.trim()) { setMsg("请填写提交密码", "err"); return; }
       currentPasscode = passcode.value.trim();
